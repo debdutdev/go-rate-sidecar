@@ -10,11 +10,11 @@ import (
 	"testing"
 	"time"
 
-	ratelimiter "github.com/12345debdut/rate-limiter"
-	"github.com/12345debdut/rate-limiter/algorithm"
-	"github.com/12345debdut/rate-limiter/internal/clock"
-	"github.com/12345debdut/rate-limiter/key"
-	"github.com/12345debdut/rate-limiter/store"
+	ratelimiter "github.com/debdutdev/rate-limiter"
+	"github.com/debdutdev/rate-limiter/algorithm"
+	"github.com/debdutdev/rate-limiter/internal/clock"
+	"github.com/debdutdev/rate-limiter/key"
+	"github.com/debdutdev/rate-limiter/store"
 )
 
 // failingLimiter always returns an error, used to test fail-open behavior.

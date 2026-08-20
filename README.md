@@ -28,7 +28,7 @@ A production-grade rate limiting library for Go with five algorithms, in-memory 
 ### Install
 
 ```bash
-go get github.com/12345debdut/rate-limiter
+go get github.com/debdutdev/rate-limiter
 ```
 
 ### Mode A: Programmatic (full control)
@@ -41,10 +41,10 @@ import (
     "net/http"
     "time"
 
-    ratelimiter "github.com/12345debdut/rate-limiter"
-    "github.com/12345debdut/rate-limiter/algorithm"
-    "github.com/12345debdut/rate-limiter/middleware"
-    "github.com/12345debdut/rate-limiter/store"
+    ratelimiter "github.com/debdutdev/rate-limiter"
+    "github.com/debdutdev/rate-limiter/algorithm"
+    "github.com/debdutdev/rate-limiter/middleware"
+    "github.com/debdutdev/rate-limiter/store"
 )
 
 func main() {

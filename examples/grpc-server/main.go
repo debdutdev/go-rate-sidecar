@@ -7,10 +7,10 @@ import (
 	"net"
 	"time"
 
-	ratelimiter "github.com/12345debdut/rate-limiter"
-	"github.com/12345debdut/rate-limiter/algorithm"
-	rlgrpc "github.com/12345debdut/rate-limiter/grpc"
-	"github.com/12345debdut/rate-limiter/store"
+	ratelimiter "github.com/debdutdev/rate-limiter"
+	"github.com/debdutdev/rate-limiter/algorithm"
+	rlgrpc "github.com/debdutdev/rate-limiter/grpc"
+	"github.com/debdutdev/rate-limiter/store"
 	"google.golang.org/grpc"
 	pb "google.golang.org/grpc/health/grpc_health_v1"
 )

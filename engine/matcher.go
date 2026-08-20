@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	ratelimiter "github.com/12345debdut/rate-limiter"
-	"github.com/12345debdut/rate-limiter/key"
+	ratelimiter "github.com/debdutdev/rate-limiter"
+	"github.com/debdutdev/rate-limiter/key"
 )
 
 // compiledRule is a rule ready for request-time matching.

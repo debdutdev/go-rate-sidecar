@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/12345debdut/rate-limiter/store"
+	"github.com/debdutdev/rate-limiter/store"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

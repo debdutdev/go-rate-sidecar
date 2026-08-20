@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	ratelimiter "github.com/12345debdut/rate-limiter"
-	"github.com/12345debdut/rate-limiter/algorithm"
-	"github.com/12345debdut/rate-limiter/store"
+	ratelimiter "github.com/debdutdev/rate-limiter"
+	"github.com/debdutdev/rate-limiter/algorithm"
+	"github.com/debdutdev/rate-limiter/store"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 )

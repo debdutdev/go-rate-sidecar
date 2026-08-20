@@ -1,6 +1,6 @@
 package algorithm
 
-import "github.com/12345debdut/rate-limiter/internal/clock"
+import "github.com/debdutdev/rate-limiter/internal/clock"
 
 type options struct {
 	clock clock.Clock

@@ -8,8 +8,8 @@ import (
 	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
 
-	ratelimiter "github.com/12345debdut/rate-limiter"
-	"github.com/12345debdut/rate-limiter/store"
+	ratelimiter "github.com/debdutdev/rate-limiter"
+	"github.com/debdutdev/rate-limiter/store"
 )
 
 func setupRedisStore(t *testing.T) *store.RedisStore {

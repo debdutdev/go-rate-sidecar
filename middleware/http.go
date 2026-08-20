@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	ratelimiter "github.com/12345debdut/rate-limiter"
-	"github.com/12345debdut/rate-limiter/key"
+	ratelimiter "github.com/debdutdev/rate-limiter"
+	"github.com/debdutdev/rate-limiter/key"
 )
 
 // HTTPConfig configures the HTTP rate-limiting middleware.

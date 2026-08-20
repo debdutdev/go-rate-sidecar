@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	ratelimiter "github.com/12345debdut/rate-limiter"
-	"github.com/12345debdut/rate-limiter/internal/clock"
-	"github.com/12345debdut/rate-limiter/store"
+	ratelimiter "github.com/debdutdev/rate-limiter"
+	"github.com/debdutdev/rate-limiter/internal/clock"
+	"github.com/debdutdev/rate-limiter/store"
 )
 
 func benchmarkAlgorithm(b *testing.B, algType Type, cfg ratelimiter.Config) {

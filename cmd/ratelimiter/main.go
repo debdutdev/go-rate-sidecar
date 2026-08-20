@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/12345debdut/rate-limiter/engine"
+	"github.com/debdutdev/rate-limiter/engine"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 

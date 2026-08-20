@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	ratelimiter "github.com/12345debdut/rate-limiter"
+	ratelimiter "github.com/debdutdev/rate-limiter"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

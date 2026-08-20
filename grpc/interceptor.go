@@ -4,7 +4,7 @@ import (
 	"context"
 	"strconv"
 
-	ratelimiter "github.com/12345debdut/rate-limiter"
+	ratelimiter "github.com/debdutdev/rate-limiter"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"

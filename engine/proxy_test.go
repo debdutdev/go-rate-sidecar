@@ -6,7 +6,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/12345debdut/rate-limiter/store"
+	"github.com/debdutdev/rate-limiter/store"
 )
 
 func newTestProxy(t *testing.T, yaml string, upstream *httptest.Server) (http.Handler, *Engine) {

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	ratelimiter "github.com/12345debdut/rate-limiter"
-	"github.com/12345debdut/rate-limiter/algorithm"
+	ratelimiter "github.com/debdutdev/rate-limiter"
+	"github.com/debdutdev/rate-limiter/algorithm"
 	"gopkg.in/yaml.v3"
 )
 

@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/12345debdut/rate-limiter/engine"
+	"github.com/debdutdev/rate-limiter/engine"
 )
 
 func main() {

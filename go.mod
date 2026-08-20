@@ -1,4 +1,4 @@
-module github.com/12345debdut/rate-limiter
+module github.com/debdutdev/rate-limiter
 
 go 1.25.3
 
