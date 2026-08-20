@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app
+  labels:
+    app: my-app
+spec:
+  containers:
+    - name: app
+      image: your-app:latest
+      ports:
+        - containerPort: 8081
+
+    - name: rate-limiter
+      image: ratelimiter:latest
+      ports:
+        - containerPort: 8080
+      args: ["--config", "/etc/ratelimiter/config.yaml"]
+      volumeMounts:
+        - name: config
+          mountPath: /etc/ratelimiter
+      resources:
+        requests:
+          cpu: 50m
+          memory: 32Mi
+        limits:
+          cpu: 200m
+          memory: 64Mi
+
+  volumes:
+    - name: config
+      configMap:
+        name: ratelimiter-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ratelimiter-config
+data:
+  config.yaml: |
+    server:
+      listen: ":8080"
+    upstream:
+      url: "http://localhost:8081"
+      timeout: 30s
+      health_path: "/health"
+    store:
+      type: memory
+    metrics:
+      enabled: true
+    default:
+      algorithm: token_bucket
+      rate: 100
+      burst: 200
+      key_by: ip
+    rules:
+      - name: "auth-strict"
+        path: "/api/v1/login"
+        method: POST
+        algorithm: sliding_window_counter
+        rate: 5
+        window: 1m
+        key_by: ip
+      - name: "health"
+        path: "/health"
+        skip: true
+      - name: "catch-all"
+        path: "/api/**"
+        algorithm: token_bucket
+        rate: 500
+        burst: 1000
+        key_by: ip

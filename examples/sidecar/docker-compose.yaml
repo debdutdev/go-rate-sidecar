@@ -1,0 +1,16 @@
+services:
+  rate-limiter:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./ratelimiter.yaml:/etc/ratelimiter/config.yaml:ro
+    depends_on:
+      - app
+
+  app:
+    image: your-app:latest
+    expose:
+      - "8081"

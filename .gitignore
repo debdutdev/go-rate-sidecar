@@ -4,7 +4,13 @@
 *.dll
 *.so
 *.dylib
-ratelimiter
+/ratelimiter
+/basic
+/redis
+/http-server
+/engine-server
+/grpc-server
+/multi-algorithm
 
 # Test binary
 *.test

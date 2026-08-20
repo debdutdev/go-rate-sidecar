@@ -1,0 +1,53 @@
+server:
+  listen: ":8080"
+
+upstream:
+  url: "http://app:8081"
+  timeout: 30s
+  health_path: "/health"
+
+store:
+  type: memory
+
+metrics:
+  enabled: true
+
+default:
+  algorithm: token_bucket
+  rate: 100
+  burst: 200
+  key_by: ip
+
+rules:
+  - name: "auth-strict"
+    path: "/api/v1/login"
+    method: POST
+    algorithm: sliding_window_counter
+    rate: 5
+    window: 1m
+    key_by: ip
+
+  - name: "user-api"
+    path: "/api/v1/users/*"
+    algorithm: token_bucket
+    rate: 50
+    burst: 100
+    key_by: "header:X-API-Key"
+
+  - name: "upload"
+    path: "/api/v1/upload/*"
+    algorithm: leaky_bucket
+    rate: 2
+    burst: 5
+    key_by: "header:Authorization"
+
+  - name: "health"
+    path: "/health"
+    skip: true
+
+  - name: "catch-all-api"
+    path: "/api/**"
+    algorithm: token_bucket
+    rate: 500
+    burst: 1000
+    key_by: ip
