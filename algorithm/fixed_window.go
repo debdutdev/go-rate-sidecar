@@ -28,7 +28,12 @@ type FixedWindow struct {
 	clock  clock.Clock
 }
 
+// NewFixedWindow creates a fixed window counter limiter.
+// Rate is the maximum requests per Window. The store must be non-nil.
 func NewFixedWindow(cfg ratelimiter.Config, s store.Store, opts ...Option) (*FixedWindow, error) {
+	if s == nil {
+		return nil, fmt.Errorf("%w: store must not be nil", ratelimiter.ErrInvalidConfig)
+	}
 	if cfg.Rate <= 0 {
 		return nil, fmt.Errorf("%w: rate must be > 0", ratelimiter.ErrInvalidConfig)
 	}
@@ -51,11 +56,17 @@ func (fw *FixedWindow) windowStart(t time.Time) time.Time {
 	return time.Unix(0, truncated).UTC()
 }
 
+// Allow checks whether a single request identified by key is permitted.
 func (fw *FixedWindow) Allow(ctx context.Context, key string) (ratelimiter.Result, error) {
 	return fw.AllowN(ctx, key, 1)
 }
 
+// AllowN checks whether n requests can be counted for the given key.
+// n must be positive.
 func (fw *FixedWindow) AllowN(ctx context.Context, key string, n int64) (ratelimiter.Result, error) {
+	if n <= 0 {
+		return ratelimiter.Result{}, fmt.Errorf("%w: n must be > 0, got %d", ratelimiter.ErrInvalidConfig, n)
+	}
 	if rs, ok := fw.store.(*store.RedisStore); ok {
 		return fw.allowRedis(ctx, rs, key, n)
 	}
@@ -156,10 +167,12 @@ func (fw *FixedWindow) allowRedis(ctx context.Context, rs *store.RedisStore, key
 	return result, nil
 }
 
+// Reset clears all state for the given key.
 func (fw *FixedWindow) Reset(ctx context.Context, key string) error {
 	return fw.store.Delete(ctx, key)
 }
 
+// Close is a no-op for FixedWindow (state lives in the store).
 func (fw *FixedWindow) Close() error {
 	return nil
 }

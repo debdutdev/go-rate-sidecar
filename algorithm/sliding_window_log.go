@@ -27,7 +27,12 @@ type SlidingWindowLog struct {
 	clock  clock.Clock
 }
 
+// NewSlidingWindowLog creates a sliding window log limiter.
+// Rate is the maximum requests per Window. The store must be non-nil.
 func NewSlidingWindowLog(cfg ratelimiter.Config, s store.Store, opts ...Option) (*SlidingWindowLog, error) {
+	if s == nil {
+		return nil, fmt.Errorf("%w: store must not be nil", ratelimiter.ErrInvalidConfig)
+	}
 	if cfg.Rate <= 0 {
 		return nil, fmt.Errorf("%w: rate must be > 0", ratelimiter.ErrInvalidConfig)
 	}
@@ -44,11 +49,17 @@ func NewSlidingWindowLog(cfg ratelimiter.Config, s store.Store, opts ...Option) 
 	}, nil
 }
 
+// Allow checks whether a single request identified by key is permitted.
 func (sw *SlidingWindowLog) Allow(ctx context.Context, key string) (ratelimiter.Result, error) {
 	return sw.AllowN(ctx, key, 1)
 }
 
+// AllowN checks whether n requests can be recorded for the given key.
+// n must be positive.
 func (sw *SlidingWindowLog) AllowN(ctx context.Context, key string, n int64) (ratelimiter.Result, error) {
+	if n <= 0 {
+		return ratelimiter.Result{}, fmt.Errorf("%w: n must be > 0, got %d", ratelimiter.ErrInvalidConfig, n)
+	}
 	if rs, ok := sw.store.(*store.RedisStore); ok {
 		return sw.allowRedis(ctx, rs, key, n)
 	}
@@ -159,10 +170,12 @@ func (sw *SlidingWindowLog) allowRedis(ctx context.Context, rs *store.RedisStore
 	return result, nil
 }
 
+// Reset clears all state for the given key.
 func (sw *SlidingWindowLog) Reset(ctx context.Context, key string) error {
 	return sw.store.Delete(ctx, key)
 }
 
+// Close is a no-op for SlidingWindowLog (state lives in the store).
 func (sw *SlidingWindowLog) Close() error {
 	return nil
 }

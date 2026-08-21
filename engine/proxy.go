@@ -61,6 +61,7 @@ type ProxyConfigError struct {
 	Msg string
 }
 
+// Error implements the error interface.
 func (e *ProxyConfigError) Error() string {
 	return e.Msg
 }

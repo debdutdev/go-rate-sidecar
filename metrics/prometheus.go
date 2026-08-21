@@ -44,6 +44,10 @@ type InstrumentedConfig struct {
 // Metrics are registered on the provided (or default) registerer.
 // If the same metric names are already registered (e.g. multiple rules
 // sharing a registerer), the existing collectors are reused.
+//
+// Panics if a collector cannot be registered for reasons other than
+// a duplicate registration (e.g. conflicting label sets). This matches
+// prometheus.MustRegister behavior and indicates a programming error.
 func NewInstrumentedLimiter(limiter ratelimiter.Limiter, cfg InstrumentedConfig) *InstrumentedLimiter {
 	if cfg.Registerer == nil {
 		cfg.Registerer = prometheus.DefaultRegisterer
@@ -114,10 +118,12 @@ func registerOrReuse(reg prometheus.Registerer, c prometheus.Collector) promethe
 	panic(err)
 }
 
+// Allow checks a single request and records metrics.
 func (il *InstrumentedLimiter) Allow(ctx context.Context, key string) (ratelimiter.Result, error) {
 	return il.AllowN(ctx, key, 1)
 }
 
+// AllowN checks n requests and records metrics.
 func (il *InstrumentedLimiter) AllowN(ctx context.Context, key string, n int64) (ratelimiter.Result, error) {
 	start := time.Now()
 	result, err := il.limiter.AllowN(ctx, key, n)
@@ -149,10 +155,12 @@ func (il *InstrumentedLimiter) AllowN(ctx context.Context, key string, n int64) 
 	return result, nil
 }
 
+// Reset delegates to the wrapped limiter.
 func (il *InstrumentedLimiter) Reset(ctx context.Context, key string) error {
 	return il.limiter.Reset(ctx, key)
 }
 
+// Close delegates to the wrapped limiter.
 func (il *InstrumentedLimiter) Close() error {
 	return il.limiter.Close()
 }

@@ -25,7 +25,13 @@ type LeakyBucket struct {
 	clock clock.Clock
 }
 
+// NewLeakyBucket creates a leaky bucket limiter.
+// Rate is the drain rate (requests per second), Burst is the maximum queue depth.
+// The store must be non-nil.
 func NewLeakyBucket(cfg ratelimiter.Config, s store.Store, opts ...Option) (*LeakyBucket, error) {
+	if s == nil {
+		return nil, fmt.Errorf("%w: store must not be nil", ratelimiter.ErrInvalidConfig)
+	}
 	if cfg.Rate <= 0 {
 		return nil, fmt.Errorf("%w: rate must be > 0", ratelimiter.ErrInvalidConfig)
 	}
@@ -42,11 +48,17 @@ func NewLeakyBucket(cfg ratelimiter.Config, s store.Store, opts ...Option) (*Lea
 	}, nil
 }
 
+// Allow checks whether a single request identified by key is permitted.
 func (lb *LeakyBucket) Allow(ctx context.Context, key string) (ratelimiter.Result, error) {
 	return lb.AllowN(ctx, key, 1)
 }
 
+// AllowN checks whether n slots can be consumed for the given key.
+// n must be positive.
 func (lb *LeakyBucket) AllowN(ctx context.Context, key string, n int64) (ratelimiter.Result, error) {
+	if n <= 0 {
+		return ratelimiter.Result{}, fmt.Errorf("%w: n must be > 0, got %d", ratelimiter.ErrInvalidConfig, n)
+	}
 	if rs, ok := lb.store.(*store.RedisStore); ok {
 		return lb.allowRedis(ctx, rs, key, n)
 	}
@@ -142,10 +154,12 @@ func (lb *LeakyBucket) allowRedis(ctx context.Context, rs *store.RedisStore, key
 	return result, nil
 }
 
+// Reset clears all state for the given key.
 func (lb *LeakyBucket) Reset(ctx context.Context, key string) error {
 	return lb.store.Delete(ctx, key)
 }
 
+// Close is a no-op for LeakyBucket (state lives in the store).
 func (lb *LeakyBucket) Close() error {
 	return nil
 }

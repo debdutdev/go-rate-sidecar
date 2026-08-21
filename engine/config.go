@@ -176,7 +176,7 @@ func validateKeyBy(keyBy string) error {
 	case strings.HasPrefix(keyBy, "header:"):
 		header := strings.TrimPrefix(keyBy, "header:")
 		if header == "" {
-			return fmt.Errorf("key_by 'header:' requires a header name")
+			return fmt.Errorf("%w: key_by 'header:' requires a header name", ratelimiter.ErrInvalidConfig)
 		}
 		return nil
 	case keyBy == "path":
@@ -184,7 +184,7 @@ func validateKeyBy(keyBy string) error {
 	case strings.HasPrefix(keyBy, "composite:"):
 		parts := strings.Split(strings.TrimPrefix(keyBy, "composite:"), ",")
 		if len(parts) < 2 {
-			return fmt.Errorf("key_by 'composite:' requires at least 2 extractors")
+			return fmt.Errorf("%w: key_by 'composite:' requires at least 2 extractors", ratelimiter.ErrInvalidConfig)
 		}
 		for _, p := range parts {
 			if err := validateKeyBy(strings.TrimSpace(p)); err != nil {
@@ -193,6 +193,6 @@ func validateKeyBy(keyBy string) error {
 		}
 		return nil
 	default:
-		return fmt.Errorf("unknown key_by format: %q", keyBy)
+		return fmt.Errorf("%w: unknown key_by format: %q", ratelimiter.ErrInvalidConfig, keyBy)
 	}
 }

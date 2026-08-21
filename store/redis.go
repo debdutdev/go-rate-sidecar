@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	ratelimiter "github.com/debdutdev/rate-limiter"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -36,7 +37,7 @@ type RedisConfig struct {
 // NewRedisStore creates a Redis-backed store and pre-loads all Lua scripts.
 func NewRedisStore(ctx context.Context, cfg RedisConfig) (*RedisStore, error) {
 	if cfg.Client == nil {
-		return nil, fmt.Errorf("redis client is required")
+		return nil, fmt.Errorf("%w: redis client is required", ratelimiter.ErrInvalidConfig)
 	}
 	if cfg.Prefix == "" {
 		cfg.Prefix = "rl:"
@@ -135,6 +136,7 @@ func (rs *RedisStore) SlidingWindowCounterAllow(ctx context.Context, key string,
 
 // --- Generic Store interface implementation (fallback for any backend) ---
 
+// Get checks key existence. Algorithms use Lua scripts directly rather than this method.
 func (rs *RedisStore) Get(ctx context.Context, key string) (State, bool, error) {
 	// Not used when algorithms type-assert to *RedisStore directly.
 	// Provided for Store interface compliance.
@@ -145,19 +147,23 @@ func (rs *RedisStore) Get(ctx context.Context, key string) (State, bool, error) 
 	return State{}, exists > 0, nil
 }
 
+// Set writes a placeholder value for key with the given TTL.
 func (rs *RedisStore) Set(ctx context.Context, key string, state State, ttl time.Duration) error {
 	return rs.client.Set(ctx, rs.key(key), "1", ttl).Err()
 }
 
+// CompareAndSwap is not supported on RedisStore; algorithms use Lua scripts instead.
 func (rs *RedisStore) CompareAndSwap(_ context.Context, _ string, _, _ State, _ time.Duration) (bool, error) {
 	// Not used — algorithms use the Lua-script methods instead.
 	return false, fmt.Errorf("CompareAndSwap not supported on RedisStore; use algorithm-specific methods")
 }
 
+// Delete removes the key from Redis.
 func (rs *RedisStore) Delete(ctx context.Context, key string) error {
 	return rs.client.Del(ctx, rs.key(key)).Err()
 }
 
+// Close closes the underlying Redis client.
 func (rs *RedisStore) Close() error {
 	return rs.client.Close()
 }

@@ -169,7 +169,10 @@ func (e *Engine) compileRule(rule RuleConfig, opts *engineOptions) (compiledRule
 		return compiledRule{config: rule}, nil
 	}
 
-	algType, _ := algorithm.ParseType(rule.Algorithm)
+	algType, err := algorithm.ParseType(rule.Algorithm)
+	if err != nil {
+		return compiledRule{}, err
+	}
 	cfg := ratelimiter.Config{
 		Rate:   rule.Rate,
 		Burst:  rule.Burst,
@@ -237,7 +240,7 @@ func createStore(cfg StoreConfig) (store.Store, error) {
 			Prefix: cfg.Redis.Prefix,
 		})
 	default:
-		return nil, fmt.Errorf("unknown store type: %q", cfg.Type)
+		return nil, fmt.Errorf("%w: unknown store type: %q", ratelimiter.ErrInvalidConfig, cfg.Type)
 	}
 }
 

@@ -40,15 +40,18 @@ func PeerAddrExtractor() KeyExtractor {
 }
 
 // MetadataExtractor returns the value of a metadata key as the rate-limiting key.
+// If the metadata key is absent, falls back to the peer address so that
+// requests without the key are still rate-limited individually.
 func MetadataExtractor(key string) KeyExtractor {
-	return func(ctx context.Context, _ string) string {
+	peerFallback := PeerAddrExtractor()
+	return func(ctx context.Context, fullMethod string) string {
 		if md, ok := metadata.FromIncomingContext(ctx); ok {
 			vals := md.Get(key)
 			if len(vals) > 0 {
 				return vals[0]
 			}
 		}
-		return ""
+		return peerFallback(ctx, fullMethod)
 	}
 }
 
@@ -63,6 +66,9 @@ func MethodExtractor() KeyExtractor {
 // enforces rate limiting. Denied requests receive codes.ResourceExhausted
 // with rate-limit details in trailing metadata.
 func UnaryServerInterceptor(cfg InterceptorConfig) grpc.UnaryServerInterceptor {
+	if cfg.Limiter == nil {
+		panic("grpc.InterceptorConfig.Limiter must not be nil")
+	}
 	if cfg.KeyExtractor == nil {
 		cfg.KeyExtractor = PeerAddrExtractor()
 	}
@@ -98,6 +104,9 @@ func UnaryServerInterceptor(cfg InterceptorConfig) grpc.UnaryServerInterceptor {
 // enforces rate limiting. Denied streams receive codes.ResourceExhausted
 // before the stream handler is invoked.
 func StreamServerInterceptor(cfg InterceptorConfig) grpc.StreamServerInterceptor {
+	if cfg.Limiter == nil {
+		panic("grpc.InterceptorConfig.Limiter must not be nil")
+	}
 	if cfg.KeyExtractor == nil {
 		cfg.KeyExtractor = PeerAddrExtractor()
 	}

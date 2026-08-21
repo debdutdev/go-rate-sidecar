@@ -35,6 +35,9 @@ type HTTPConfig struct {
 // HTTP returns standard net/http middleware that rate-limits requests.
 // Compatible with net/http, chi, and any mux using func(http.Handler) http.Handler.
 func HTTP(cfg HTTPConfig) func(http.Handler) http.Handler {
+	if cfg.Limiter == nil {
+		panic("middleware.HTTPConfig.Limiter must not be nil")
+	}
 	if cfg.KeyExtractor == nil {
 		cfg.KeyExtractor = key.IPExtractor()
 	}

@@ -24,7 +24,13 @@ type TokenBucket struct {
 	clock clock.Clock
 }
 
+// NewTokenBucket creates a token bucket limiter.
+// Rate is the token refill rate (tokens per second), Burst is the bucket capacity.
+// The store must be non-nil.
 func NewTokenBucket(cfg ratelimiter.Config, s store.Store, opts ...Option) (*TokenBucket, error) {
+	if s == nil {
+		return nil, fmt.Errorf("%w: store must not be nil", ratelimiter.ErrInvalidConfig)
+	}
 	if cfg.Rate <= 0 {
 		return nil, fmt.Errorf("%w: rate must be > 0", ratelimiter.ErrInvalidConfig)
 	}
@@ -41,11 +47,17 @@ func NewTokenBucket(cfg ratelimiter.Config, s store.Store, opts ...Option) (*Tok
 	}, nil
 }
 
+// Allow checks whether a single request identified by key is permitted.
 func (tb *TokenBucket) Allow(ctx context.Context, key string) (ratelimiter.Result, error) {
 	return tb.AllowN(ctx, key, 1)
 }
 
+// AllowN checks whether n tokens can be consumed for the given key.
+// n must be positive.
 func (tb *TokenBucket) AllowN(ctx context.Context, key string, n int64) (ratelimiter.Result, error) {
+	if n <= 0 {
+		return ratelimiter.Result{}, fmt.Errorf("%w: n must be > 0, got %d", ratelimiter.ErrInvalidConfig, n)
+	}
 	// Optimized Redis path — single atomic Lua script call.
 	if rs, ok := tb.store.(*store.RedisStore); ok {
 		return tb.allowRedis(ctx, rs, key, n)
@@ -141,10 +153,12 @@ func (tb *TokenBucket) allowRedis(ctx context.Context, rs *store.RedisStore, key
 	return result, nil
 }
 
+// Reset clears all state for the given key, restoring it to a fresh bucket.
 func (tb *TokenBucket) Reset(ctx context.Context, key string) error {
 	return tb.store.Delete(ctx, key)
 }
 
+// Close is a no-op for TokenBucket (state lives in the store).
 func (tb *TokenBucket) Close() error {
 	return nil
 }

@@ -11,10 +11,15 @@ import (
 type Type int
 
 const (
+	// TypeTokenBucket is the token bucket algorithm.
 	TypeTokenBucket Type = iota
+	// TypeLeakyBucket is the leaky bucket algorithm.
 	TypeLeakyBucket
+	// TypeFixedWindow is the fixed window counter algorithm.
 	TypeFixedWindow
+	// TypeSlidingWindowLog is the sliding window log algorithm.
 	TypeSlidingWindowLog
+	// TypeSlidingWindowCounter is the sliding window counter algorithm.
 	TypeSlidingWindowCounter
 )
 
@@ -26,6 +31,7 @@ var typeNames = map[Type]string{
 	TypeSlidingWindowCounter: "sliding_window_counter",
 }
 
+// String returns the snake_case name of the algorithm type.
 func (t Type) String() string {
 	if name, ok := typeNames[t]; ok {
 		return name
@@ -44,7 +50,11 @@ func ParseType(name string) (Type, error) {
 }
 
 // New creates a Limiter of the given algorithm type.
+// The store must be non-nil; all algorithms require a backing store.
 func New(t Type, cfg ratelimiter.Config, s store.Store, opts ...Option) (ratelimiter.Limiter, error) {
+	if s == nil {
+		return nil, fmt.Errorf("%w: store must not be nil", ratelimiter.ErrInvalidConfig)
+	}
 	switch t {
 	case TypeTokenBucket:
 		return NewTokenBucket(cfg, s, opts...)

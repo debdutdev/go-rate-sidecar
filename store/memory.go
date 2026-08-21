@@ -57,6 +57,7 @@ func (m *Memory) evictionLoop(interval time.Duration) {
 	}
 }
 
+// Get retrieves the state for key, returning false if not found or expired.
 func (m *Memory) Get(_ context.Context, key string) (State, bool, error) {
 	val, ok := m.entries.Load(key)
 	if !ok {
@@ -73,6 +74,7 @@ func (m *Memory) Get(_ context.Context, key string) (State, bool, error) {
 	return e.state, true, nil
 }
 
+// Set writes state for key with the given TTL.
 func (m *Memory) Set(_ context.Context, key string, state State, ttl time.Duration) error {
 	var expiresAt time.Time
 	if ttl > 0 {
@@ -93,6 +95,7 @@ func (m *Memory) Set(_ context.Context, key string, state State, ttl time.Durati
 	return nil
 }
 
+// CompareAndSwap updates state only if the stored version matches old.Version.
 func (m *Memory) CompareAndSwap(_ context.Context, key string, old, new State, ttl time.Duration) (bool, error) {
 	var expiresAt time.Time
 	if ttl > 0 {
@@ -124,11 +127,13 @@ func (m *Memory) CompareAndSwap(_ context.Context, key string, old, new State, t
 	return true, nil
 }
 
+// Delete removes state for key.
 func (m *Memory) Delete(_ context.Context, key string) error {
 	m.entries.Delete(key)
 	return nil
 }
 
+// Close stops the background eviction goroutine.
 func (m *Memory) Close() error {
 	m.stopOnce.Do(func() {
 		close(m.stopCh)

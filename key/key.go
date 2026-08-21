@@ -31,9 +31,16 @@ func IPExtractor() Extractor {
 }
 
 // HeaderExtractor returns the value of a specific header as the key.
+// If the header is absent, falls back to the client IP so that
+// requests without the header are still rate-limited individually
+// rather than sharing one empty-string bucket.
 func HeaderExtractor(header string) Extractor {
+	ipFallback := IPExtractor()
 	return func(r *http.Request) string {
-		return r.Header.Get(header)
+		if v := r.Header.Get(header); v != "" {
+			return v
+		}
+		return ipFallback(r)
 	}
 }
 
