@@ -11,6 +11,10 @@
 /engine-server
 /grpc-server
 /multi-algorithm
+/per-route
+/multi-tier
+/prometheus
+/allown
 
 # Test binary
 *.test
