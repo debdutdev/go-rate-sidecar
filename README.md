@@ -457,13 +457,30 @@ rate-limiter/
 ├── Dockerfile
 └── examples/
     ├── basic/              # Direct API usage
-    ├── redis/              # Redis-backed limiting
+    ├── allown/             # Variable-cost requests (AllowN)
+    ├── multi-algorithm/    # All 5 algorithms compared
     ├── http-server/        # Programmatic middleware
+    ├── per-route/          # Different limiters per endpoint
+    ├── multi-tier/         # API key tier-based limiting
     ├── engine-server/      # Config-driven engine
+    ├── redis/              # Redis-backed limiting
     ├── grpc-server/        # gRPC interceptors
-    ├── multi-algorithm/    # Algorithm comparison
+    ├── prometheus/         # Prometheus metrics with /metrics
     └── sidecar/            # Docker + Kubernetes deployment
 ```
+
+## Examples
+
+See [examples/README.md](examples/README.md) for the full list with run instructions. Quick highlights:
+
+| Example | Use Case |
+|---|---|
+| [basic](examples/basic/) | First-time usage — `Allow()` calls in 20 lines |
+| [per-route](examples/per-route/) | Different limits per endpoint without YAML |
+| [multi-tier](examples/multi-tier/) | Free vs pro users with different quotas |
+| [prometheus](examples/prometheus/) | Wire up metrics and expose `/metrics` |
+| [allown](examples/allown/) | Variable-cost requests (uploads, batch APIs) |
+| [engine-server](examples/engine-server/) | Config-driven — all rules in YAML, two lines of Go |
 
 ## License
 
