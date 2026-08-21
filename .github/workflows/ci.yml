@@ -27,7 +27,13 @@ jobs:
         run: go vet ./...
 
       - name: Test
-        run: go test -race -coverprofile=coverage.out ./...
+        run: go test -race ./...
+
+      - name: Coverage
+        if: matrix.go-version == '1.25'
+        run: |
+          go test -coverprofile=coverage.out -coverpkg=./... \
+            ./algorithm/ ./store/ ./middleware/ ./grpc/ ./metrics/ ./engine/ ./internal/clock/
 
       - name: Upload coverage
         if: matrix.go-version == '1.25'
